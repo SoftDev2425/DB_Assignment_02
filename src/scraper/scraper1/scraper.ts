@@ -57,71 +57,75 @@ const scraper1 = async () => {
           for (const record of records) {
             // NOTE: We are well aware that the transactions below can be done in a single transaction - we separated them for clarity
 
-            const newCountry = await con.query`
-          IF NOT EXISTS (SELECT 1 FROM Countries WHERE name = ${record.country.name})
-          BEGIN
-              INSERT INTO Countries (name)
-              VALUES (${record.country.name});
-          END
-          `;
+          //   const newCountry = await con.query`
+          // IF NOT EXISTS (SELECT 1 FROM Countries WHERE name = ${record.country.name})
+          // BEGIN
+          //     INSERT INTO Countries (name)
+          //     VALUES (${record.country.name});
+          // END
+          // `;
 
-            const newCity = await con.query`
-          IF NOT EXISTS (SELECT 1 FROM Cities WHERE name = ${record.city.name})
-          BEGIN
-              DECLARE @country_id uniqueidentifier;
+            // create country
+            
 
-              SELECT @country_id = id FROM Countries WHERE name = ${record.country.name};
 
-              IF @country_id IS NOT NULL
-              BEGIN
-                INSERT INTO Cities (name, C40Status, countryID)
-                VALUES (${record.city.name}, ${record.city.C40Status == true ? 1 : 0}, @country_id)
-              END
-          END
-          `;
+          //   const newCity = await con.query`
+          // IF NOT EXISTS (SELECT 1 FROM Cities WHERE name = ${record.city.name})
+          // BEGIN
+          //     DECLARE @country_id uniqueidentifier;
 
-            // create organisation
-            const newOrganisation = await con.query`
-              IF NOT EXISTS (SELECT 1 FROM Organisations WHERE accountNo = ${record.organisation.accountNo})
-              BEGIN
-                  DECLARE @city_id uniqueidentifier;
-                  DECLARE @country_id uniqueidentifier;
+          //     SELECT @country_id = id FROM Countries WHERE name = ${record.country.name};
 
-                  SELECT @city_id = id FROM Cities WHERE name = ${record.city.name};
-                  SELECT @country_id = id FROM Countries WHERE name = ${record.country.name};
+          //     IF @country_id IS NOT NULL
+          //     BEGIN
+          //       INSERT INTO Cities (name, C40Status, countryID)
+          //       VALUES (${record.city.name}, ${record.city.C40Status == true ? 1 : 0}, @country_id)
+          //     END
+          // END
+          // `;
 
-                  IF @country_id IS NOT NULL AND @city_id IS NOT NULL
-                  BEGIN
-                    INSERT INTO Organisations (name, accountNo, countryID, cityID)
-                    VALUES (${record.organisation.name}, ${record.organisation.accountNo}, @country_id, @city_id)
-                  END
-              END
-              `;
+          //   // create organisation
+          //   const newOrganisation = await con.query`
+          //     IF NOT EXISTS (SELECT 1 FROM Organisations WHERE accountNo = ${record.organisation.accountNo})
+          //     BEGIN
+          //         DECLARE @city_id uniqueidentifier;
+          //         DECLARE @country_id uniqueidentifier;
 
-            const newSector = await con.query`
-              IF NOT EXISTS (SELECT 1 FROM Sectors WHERE name = ${record.target.sector})
-              BEGIN
-                  INSERT INTO Sectors (name)
-                  VALUES (${record.target.sector})
-              END
-          `;
+          //         SELECT @city_id = id FROM Cities WHERE name = ${record.city.name};
+          //         SELECT @country_id = id FROM Countries WHERE name = ${record.country.name};
 
-            // create target
-            const newTarget = await con.query`
-            BEGIN
-                DECLARE @organisation_id uniqueidentifier;
-                DECLARE @sector_id uniqueidentifier;
+          //         IF @country_id IS NOT NULL AND @city_id IS NOT NULL
+          //         BEGIN
+          //           INSERT INTO Organisations (name, accountNo, countryID, cityID)
+          //           VALUES (${record.organisation.name}, ${record.organisation.accountNo}, @country_id, @city_id)
+          //         END
+          //     END
+          //     `;
 
-                SELECT @organisation_id = id FROM Organisations WHERE accountNo = ${record.organisation.accountNo};
-                SELECT @sector_id = id FROM Sectors WHERE name = ${record.target.sector};
+          //   const newSector = await con.query`
+          //     IF NOT EXISTS (SELECT 1 FROM Sectors WHERE name = ${record.target.sector})
+          //     BEGIN
+          //         INSERT INTO Sectors (name)
+          //         VALUES (${record.target.sector})
+          //     END
+          // `;
 
-                IF @organisation_id IS NOT NULL AND @sector_id IS NOT NULL
-                BEGIN
-                  INSERT INTO Targets (reportingYear, baselineYear, baselineEmissionsCO2, reductionTargetPercentage, targetYear, comment, organisationID, sectorID)
-                  VALUES (${record.target.reportingYear}, ${record.target.baselineYear}, ${record.target.baselineEmissionsCO2}, ${record.target.reductionTargetPercentage}, ${record.target.targetYear}, ${record.target.comment}, @organisation_id, @sector_id)
-                END
-            END
-            `;
+            // // create target
+            // const newTarget = await con.query`
+            // BEGIN
+            //     DECLARE @organisation_id uniqueidentifier;
+            //     DECLARE @sector_id uniqueidentifier;
+
+            //     SELECT @organisation_id = id FROM Organisations WHERE accountNo = ${record.organisation.accountNo};
+            //     SELECT @sector_id = id FROM Sectors WHERE name = ${record.target.sector};
+
+            //     IF @organisation_id IS NOT NULL AND @sector_id IS NOT NULL
+            //     BEGIN
+            //       INSERT INTO Targets (reportingYear, baselineYear, baselineEmissionsCO2, reductionTargetPercentage, targetYear, comment, organisationID, sectorID)
+            //       VALUES (${record.target.reportingYear}, ${record.target.baselineYear}, ${record.target.baselineEmissionsCO2}, ${record.target.reductionTargetPercentage}, ${record.target.targetYear}, ${record.target.comment}, @organisation_id, @sector_id)
+            //     END
+            // END
+            // `;
           }
 
           console.log("Scraper 1 done!");
