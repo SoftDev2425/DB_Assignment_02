@@ -9,21 +9,27 @@ const GHG_EmissionsSchema = new Schema({
   },
   boundary: {
     type: String,
+    trim: true,
   },
   methodology: {
     type: String,
+    trim: true,
   },
   methodologyDetails: {
     type: String,
+    trim: true,
   },
   description: {
     type: String,
+    trim: true,
   },
   comment: {
     type: String,
+    trim: true,
   },
   gassesIncluded: {
     type: String,
+    trim: true,
   },
   totalCityWideEmissionsCO2: {
     type: Number,

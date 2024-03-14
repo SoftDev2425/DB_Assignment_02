@@ -3,11 +3,11 @@ import mongoose, { Schema } from "mongoose";
 const countrySchema = new Schema({
   name: {
     type: String,
-    maxlength: 200,
+    trim: true,
   },
   regionName: {
     type: String,
-    maxlength: 200,
+    trim: true,
   },
 });
 

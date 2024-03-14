@@ -3,7 +3,7 @@ import mongoose, { Schema } from "mongoose";
 const citySchema = new Schema({
   name: {
     type: String,
-    maxlength: 200,
+    trim: true,
   },
   c40Status: {
     type: Boolean,

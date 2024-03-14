@@ -6,6 +6,7 @@ const organisationSchema = new Schema({
   },
   name: {
     type: String,
+    trim: true,
   },
   cityId: {
     type: Schema.Types.ObjectId,
