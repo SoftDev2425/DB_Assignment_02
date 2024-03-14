@@ -2,7 +2,7 @@ import fs from "fs";
 import { parse } from "csv-parse";
 import * as path from "path";
 
-const scraper1 = async (con: any) => {
+const scraper1 = async () => {
   return new Promise((resolve, reject) => {
     const csvFilePath = path.resolve(__dirname, "2016_Cities_Emissions_Reduction_Targets_20240207.csv");
 

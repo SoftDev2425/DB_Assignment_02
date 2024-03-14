@@ -10,19 +10,13 @@ import scraper3 from "./scraper3/scraper";
 import scraper4 from "./scraper4/scraper";
 import scraper5 from "./scraper5/scraper";
 
-export const scrapeAndInsertIntoDatabase = async (con?: any) => {
+export const scrapeAndInsertIntoDatabase = async () => {
   try {
-    if (!con) {
-      con = await sql.connect(mssqlConfig);
-    }
-
-    await scraper1(con);
-    await scraper2(con);
-    await scraper3(con);
-    await scraper4(con);
-    await scraper5(con);
-
-    await con.close();
+    await scraper1();
+    await scraper2();
+    await scraper3();
+    await scraper4();
+    await scraper5();
 
     console.log("All scrapers done! Now onto adding the stored procedures :)\n Run 'npm run sp'");
   } catch (error) {
