@@ -1,5 +1,4 @@
 import GHG_Emissions from "../models/GHG_Emissions";
-import Countries from "../models/countries";
 
 async function getNewestReportingYear() {
     const newestYear = await GHG_Emissions.findOne().sort('-reportingYear');
@@ -30,12 +29,12 @@ export const getTotalEmissionsForRegions = async () => {
                 as: 'country',
               },
             },
-            // {
-            //   $group: {
-            //     _id: '$country.regionName',
-            //     TotalEmissions: { $sum: '$totalCityWideEmissionsCO2' },
-            //   },
-            // },
+            {
+              $group: {
+                _id: '$country.regionName',
+                TotalEmissions: { $sum: '$totalCityWideEmissionsCO2' },
+              },
+            },
           ]);
           
         return regions;
