@@ -1,16 +1,32 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
 
-const populationSchema = new Schema({
+export interface PopulationDocument extends Document {
+  count: number;
+  year: number;
+  city_id: Schema.Types.ObjectId;
+}
+
+const populationSchema = new Schema<PopulationDocument>({
   count: {
     type: Number,
   },
   year: {
     type: Number,
   },
-  cityID: {
+  city_id: {
     type: Schema.Types.ObjectId,
-    ref: "cities",
+    ref: "Cities",
   },
 });
 
-export const Populations = mongoose.model("populations", populationSchema);
+populationSchema.set("toJSON", {
+  transform: (_document: Document, returnedObject: Record<string, any>) => {
+    returnedObject.id = returnedObject._id.toString();
+    delete returnedObject._id;
+    delete returnedObject.__v;
+  },
+});
+
+const Populations = mongoose.model("Populations", populationSchema);
+
+export default Populations;

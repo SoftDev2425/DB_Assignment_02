@@ -2,12 +2,12 @@ import fs from "fs";
 import { parse } from "csv-parse";
 import { format } from "date-fns";
 import * as path from "path";
-import { Countries } from "../../models/countries";
-import { Cities } from "../../models/cities";
-import { Populations } from "../../models/populations";
-import { Organisations } from "../../models/organisations";
-import { EmissionStatusTypes } from "../../models/emissionStatusTypes";
-import { GHG_Emissions } from "../../models/GHG_Emissions";
+import Countries from "../../models/countries";
+import Cities from "../../models/cities";
+import Populations from "../../models/populations";
+import Organisations from "../../models/organisations";
+import EmissionStatusTypes from "../../models/emissionStatusTypes";
+import GHG_Emissions from "../../models/GHG_Emissions";
 
 const scraper4 = async () => {
   return new Promise((resolve, reject) => {
@@ -93,7 +93,7 @@ const scraper4 = async () => {
                 $setOnInsert: {
                   name: record.city.name,
                   C40Status: record.city.C40Status,
-                  countryID: newCountry.upsertedId ? newCountry.upsertedId._id : undefined,
+                  country_id: newCountry.upsertedId ? newCountry.upsertedId._id : undefined,
                 },
               },
               { upsert: true, new: true }
@@ -103,7 +103,7 @@ const scraper4 = async () => {
             const newPopulation = await Populations.create({
               count: record.city.population.count,
               year: record.city.population.year,
-              cityID: newCity._id,
+              city_id: newCity._id,
             });
 
             // create organisation
@@ -113,8 +113,8 @@ const scraper4 = async () => {
                 $setOnInsert: {
                   name: record.organisation.name,
                   accountNo: record.organisation.accountNo,
-                  cityID: newCity._id,
-                  countryID: newCountry.upsertedId ? newCountry.upsertedId._id : undefined,
+                  city_id: newCity._id,
+                  country_id: newCountry.upsertedId ? newCountry.upsertedId._id : undefined,
                 },
               },
               {
@@ -143,8 +143,8 @@ const scraper4 = async () => {
               totalCityWideEmissionsCO2: record.GHG_emissions.totalCityWideEmissionsCO2,
               totalScope1_CO2: record.GHG_emissions.totalScope1CO2,
               totalScope2_CO2: record.GHG_emissions.totalScope2CO2,
-              organisationID: newOrganisation._id,
-              emissionStatusTypeID: newEmissionStatusType._id,
+              organisation_id: newOrganisation._id,
+              emissionStatusType_id: newEmissionStatusType._id,
             });
           }
 

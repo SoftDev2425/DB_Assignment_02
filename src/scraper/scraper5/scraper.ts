@@ -1,8 +1,8 @@
 import fs from "fs";
 import { parse } from "csv-parse";
 import * as path from "path";
-import { Questionnaires } from "../../models/questionnaires";
-import { Organisations } from "../../models/organisations";
+import Organisations from "../../models/organisations";
+import Questionnaires from "../../models/questionnaires";
 
 const scraper5 = async () => {
   return new Promise((resolve, reject) => {
@@ -48,7 +48,7 @@ const scraper5 = async () => {
             if (organisation) {
               await Questionnaires.create({
                 name: record.name,
-                organisationID: organisation._id,
+                organisation_id: organisation._id,
                 data: record.data,
               });
             }

@@ -1,6 +1,12 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
 
-const citySchema = new Schema({
+export interface CityDocument extends Document {
+  name: string;
+  C40Status: boolean;
+  country_id: mongoose.Types.ObjectId;
+}
+
+const citySchema = new Schema<CityDocument>({
   name: {
     type: String,
     trim: true,
@@ -9,12 +15,22 @@ const citySchema = new Schema({
   C40Status: {
     type: Boolean,
   },
-  countryID: {
+  country_id: {
     type: Schema.Types.ObjectId,
-    ref: "countries",
+    ref: "Countries",
   },
 });
 
 citySchema.index({ name: 1 }, { unique: true }); // unique index on name
 
-export const Cities = mongoose.model("cities", citySchema);
+citySchema.set("toJSON", {
+  transform: (_document: Document, returnedObject: Record<string, any>) => {
+    returnedObject.id = returnedObject._id.toString();
+    delete returnedObject._id;
+    delete returnedObject.__v;
+  },
+});
+
+const Cities = mongoose.model("Cities", citySchema);
+
+export default Cities;

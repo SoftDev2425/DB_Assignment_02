@@ -1,6 +1,11 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
 
-const countrySchema = new Schema({
+export interface CountryDocument extends Document {
+  name: string;
+  regionName: string;
+}
+
+const countrySchema = new Schema<CountryDocument>({
   name: {
     type: String,
     trim: true,
@@ -14,4 +19,14 @@ const countrySchema = new Schema({
 
 countrySchema.index({ name: 1 }, { unique: true }); // unique index on name
 
-export const Countries = mongoose.model("countries", countrySchema);
+countrySchema.set("toJSON", {
+  transform: (_document: Document, returnedObject: Record<string, any>) => {
+    returnedObject.id = returnedObject._id.toString();
+    delete returnedObject._id;
+    delete returnedObject.__v;
+  },
+});
+
+const Countries = mongoose.model("Countries", countrySchema);
+
+export default Countries;

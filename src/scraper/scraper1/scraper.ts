@@ -1,11 +1,11 @@
 import fs from "fs";
 import { parse } from "csv-parse";
 import * as path from "path";
-import { Countries } from "../../models/countries";
-import { Cities } from "../../models/cities";
-import { Organisations } from "../../models/organisations";
-import { Sectors } from "../../models/sectors";
-import { Targets } from "../../models/targets";
+import Organisations from "../../models/organisations";
+import Countries from "../../models/countries";
+import Cities from "../../models/cities";
+import Sectors from "../../models/sectors";
+import Targets from "../../models/targets";
 
 const scraper1 = async () => {
   return new Promise((resolve, reject) => {
@@ -74,7 +74,7 @@ const scraper1 = async () => {
                 $setOnInsert: {
                   name: record.city.name,
                   C40Status: record.city.C40Status,
-                  countryID: newCountry._id,
+                  country_id: newCountry._id,
                 },
               },
               { upsert: true, new: true }
@@ -87,8 +87,8 @@ const scraper1 = async () => {
                 $setOnInsert: {
                   name: record.organisation.name,
                   accountNo: record.organisation.accountNo,
-                  cityID: newCity.id,
-                  countryID: newCountry.id,
+                  city_id: newCity.id,
+                  country_id: newCountry.id,
                 },
               },
               {
@@ -112,8 +112,8 @@ const scraper1 = async () => {
               reductionTargetPercentage: record.target.reductionTargetPercentage,
               baselineEmissionsCO2: record.target.baselineEmissionsCO2,
               comment: record.target.comment,
-              organisationID: newOrganisation.id,
-              sectorID: newSector.id,
+              organisation_id: newOrganisation.id,
+              sector_id: newSector.id,
             });
           }
 

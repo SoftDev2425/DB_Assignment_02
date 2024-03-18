@@ -1,4 +1,5 @@
-import { mssqlConfig } from "../utils/db/dbConnection";
+import Cities from "../models/cities";
+import Countries from "../models/countries";
 
 // 1
 export const getTotalEmissionsByCity = async (city: string) => {
@@ -73,7 +74,12 @@ export const getC40CitiesWithEmissions = async (c40: boolean = true) => {
 // 8
 export const getTotalEmissionsForRegions = async () => {
   try {
-    return "Hello from getTotalEmissionsForRegions!";
+    // get all cities and populate the country on countryID
+    const cities = await Cities.find({}).populate({
+      path: "country_id",
+      model: Countries,
+    });
+    return cities;
   } catch (error) {
     console.error("Error:", error);
     throw error;

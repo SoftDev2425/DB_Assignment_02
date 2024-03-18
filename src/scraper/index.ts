@@ -20,7 +20,7 @@ export const scrapeAndInsertIntoDatabase = async () => {
     await scraper5();
 
     await mongoose.disconnect();
-    console.log("All scrapers done! Now you start the server by running: \n Run 'npm run sp'");
+    console.log("All scrapers done! Now you start the server by running: \n    'npm run dev'");
   } catch (error) {
     await mongoose.disconnect();
     console.error("Error occurred while running scrapers:", error);

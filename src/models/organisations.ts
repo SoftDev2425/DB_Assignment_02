@@ -1,6 +1,13 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
 
-const organisationSchema = new Schema({
+export interface OrganisationsDocument extends Document {
+  accountNo: number;
+  name: string;
+  city_id: Schema.Types.ObjectId;
+  country_id: Schema.Types.ObjectId;
+}
+
+const organisationSchema = new Schema<OrganisationsDocument>({
   accountNo: {
     type: Number,
   },
@@ -8,16 +15,26 @@ const organisationSchema = new Schema({
     type: String,
     trim: true,
   },
-  cityID: {
+  city_id: {
     type: Schema.Types.ObjectId,
-    ref: "cities",
+    ref: "Cities",
   },
-  countryID: {
+  country_id: {
     type: Schema.Types.ObjectId,
-    ref: "countries",
+    ref: "Countries",
   },
 });
 
 organisationSchema.index({ name: 1 }, { unique: true }); // unique index on name
 
-export const Organisations = mongoose.model("organisations", organisationSchema);
+organisationSchema.set("toJSON", {
+  transform: (_document: Document, returnedObject: Record<string, any>) => {
+    returnedObject.id = returnedObject._id.toString();
+    delete returnedObject._id;
+    delete returnedObject.__v;
+  },
+});
+
+const Organisations = mongoose.model("Organisations", organisationSchema);
+
+export default Organisations;

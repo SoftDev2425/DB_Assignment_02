@@ -281,14 +281,7 @@ export async function emissionRoutes(fastify: FastifyInstance) {
   // 8
   fastify.get("/regions", async function (request, reply: FastifyReply) {
     try {
-      // const data = await getTotalEmissionsForRegions();
-      // return {
-      //   regions: data.map((d) => ({
-      //     name: d.RegionName ? d.RegionName : "N/A",
-      //     totalEmission: d.TotalEmissions.toLocaleString() ? d.TotalEmissions.toLocaleString() : "N/A",
-      //   })),
-      // };
-      return "hi";
+      return await getTotalEmissionsForRegions();
     } catch (error) {
       fastify.log.error(error);
       reply.code(500).send({ error: "Failed getting regions' emissions. Please try again later." });

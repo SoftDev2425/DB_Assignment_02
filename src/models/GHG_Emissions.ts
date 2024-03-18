@@ -1,6 +1,22 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
 
-const GHG_EmissionsSchema = new Schema({
+export interface GHG_EmissionsDocument extends Document {
+  reportingYear: number;
+  measurementYear: number;
+  boundary: string;
+  methodology: string;
+  methodologyDetails: string;
+  description: string;
+  comment: string;
+  gassesIncluded: string;
+  totalCityWideEmissionsCO2: number;
+  totalScope1_CO2: number;
+  totalScope2_CO2: number;
+  organisation_id: mongoose.Types.ObjectId;
+  emissionStatusType_id: mongoose.Types.ObjectId;
+}
+
+const GHG_EmissionsSchema = new Schema<GHG_EmissionsDocument>({
   reportingYear: {
     type: Number,
   },
@@ -40,14 +56,24 @@ const GHG_EmissionsSchema = new Schema({
   totalScope2_CO2: {
     type: Number,
   },
-  organisationID: {
+  organisation_id: {
     type: Schema.Types.ObjectId,
-    ref: "organisations",
+    ref: "Organisations",
   },
-  emissionStatusTypeID: {
+  emissionStatusType_id: {
     type: Schema.Types.ObjectId,
-    ref: "emissionStatusTypes",
+    ref: "EmissionStatusTypes",
   },
 });
 
-export const GHG_Emissions = mongoose.model("GHG_emissions", GHG_EmissionsSchema);
+GHG_EmissionsSchema.set("toJSON", {
+  transform: (_document: Document, returnedObject: Record<string, any>) => {
+    returnedObject.id = returnedObject._id.toString();
+    delete returnedObject._id;
+    delete returnedObject.__v;
+  },
+});
+
+const GHG_Emissions = mongoose.model("GHG_emissions", GHG_EmissionsSchema);
+
+export default GHG_Emissions;

@@ -16,9 +16,7 @@ export async function buildServer() {
   });
 
   mongoose
-    .connect("mongodb://localhost:27017", {
-      dbName: "DB_Assignment_2",
-    })
+    .connect("mongodb://localhost:27017/db-assignment-2")
     .then(() => {
       console.log("Connected to MongoDB");
     })
