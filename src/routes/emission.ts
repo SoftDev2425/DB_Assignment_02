@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { getTotalEmissionsByCity } from "../functions/getTotalEmissionsByCity";
 import { getCitiesByStatusType } from "../functions/getCitiesByStatusType";
+import { getAvgEmissionForC40AndNonC40 } from "../functions/getAvgEmissionForC40AndNonC40";
 
 interface Params {
   cityName: string;
@@ -32,16 +33,15 @@ export async function emissionRoutes(fastify: FastifyInstance) {
     }
   });
 
-  //   // 3
-  //   fastify.get("/avg", async function (request: FastifyRequest, reply: FastifyReply) {
-  //     try {
-  //       const emissions = await GetAvgEmissionForC40AndNonC40();
-  //       return emissions;
-  //     } catch (error: any) {
-  //       fastify.log.error(error);
-  //       reply.code(500).send({ error: "Failed getting emissions. Please try again later." });
-  //     }
-  //   });
+  // 3
+  fastify.get("/avg", async function (request: FastifyRequest, reply: FastifyReply) {
+    try {
+      return await getAvgEmissionForC40AndNonC40();
+    } catch (error: any) {
+      fastify.log.error(error);
+      reply.code(500).send({ error: "Failed getting emissions. Please try again later." });
+    }
+  });
 
   //   // 4
   //   fastify.get("/targets/:cityName", async function (request: FastifyRequest<{ Params: Params }>, reply: FastifyReply) {
