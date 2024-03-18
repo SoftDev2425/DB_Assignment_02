@@ -61,21 +61,6 @@ export const getC40CitiesWithEmissions = async (c40: boolean = true) => {
   }
 };
 
-// 8 - Andreas
-export const getTotalEmissionsForRegions = async () => {
-  try {
-    // get all cities and populate the country on countryID
-    const cities = await Cities.find({}).populate({
-      path: "country_id",
-      model: Countries,
-    });
-    return cities;
-  } catch (error) {
-    console.error("Error:", error);
-    throw error;
-  }
-};
-
 // 9 - Andreas
 export const getTotalEmissionsForCountries = async () => {
   try {
