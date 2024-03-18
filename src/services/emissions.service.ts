@@ -1,12 +1,3 @@
-// // 2 - Owais
-// export const getCitiesByStatusType = async (statusType: string) => {
-//   try {
-//     return "Hello from getCitiesByStatusType!";
-//   } catch (error) {
-//     console.error("Error:", error);
-//     throw error;
-//   }
-// };
 
 // // 3 - Owais
 // export const GetAvgEmissionForC40AndNonC40 = async () => {
