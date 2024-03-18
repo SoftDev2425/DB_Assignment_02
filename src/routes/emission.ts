@@ -5,12 +5,12 @@ import {
   getCitiesWithEmissionsRanking,
   getCityEmissionTargets,
   getContriesMostProminentGasses,
-  getTotalEmissionsForRegions,
   getTotalEmissionsForCountries,
   getC40CitiesWithEmissions,
   getCitiesEmisions,
 } from "../services/emissions.service";
 import { getTotalEmissionsByCity } from "../functions/getTotalEmissionsByCity";
+import { getTotalEmissionsForRegions } from "../functions/getTotalEmissionsForRegions";
 
 interface Params {
   cityName: string;
