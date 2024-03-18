@@ -1,8 +1,15 @@
 import fs from "fs";
 import { parse } from "csv-parse";
 import * as path from "path";
+import { Countries } from "../../models/countries";
+import { Cities } from "../../models/cities";
+import { Populations } from "../../models/populations";
+import { Organisations } from "../../models/organisations";
+import { Sectors } from "../../models/sectors";
+import { TargetTypes } from "../../models/targetTypes";
+import { Targets } from "../../models/targets";
 
-const scraper2 = async (con: any) => {
+const scraper2 = async () => {
   return new Promise((resolve, reject) => {
     const csvFilePath = path.resolve(__dirname, "2017_Cities_Emissions_Reduction_Targets_20240207.csv");
 
@@ -65,105 +72,75 @@ const scraper2 = async (con: any) => {
 
         try {
           for (const record of records) {
-            // NOTE: We are well aware that the transactions below can be done in a single transaction - we separated them for clarity
+            // create country
+            const newCountry = await Countries.findOneAndUpdate(
+              { name: record.country.name },
+              { $setOnInsert: { name: record.country.name, regionName: record.country.regionName } },
+              { upsert: true, new: true }
+            );
 
-            const newCountry = await con.query`
-          IF NOT EXISTS (SELECT 1 FROM Countries WHERE name = ${record.country.name})
-          BEGIN
-              INSERT INTO Countries (name, regionName)
-              VALUES (${record.country.name}, ${record.country.regionName});
-          END
+            // create city
+            const newCity = await Cities.findOneAndUpdate(
+              { name: record.city.name },
+              {
+                $setOnInsert: {
+                  name: record.city.name,
+                  C40Status: record.city.C40Status,
+                  countryID: newCountry._id,
+                },
+              },
+              { upsert: true, new: true }
+            );
 
-          IF EXISTS (SELECT 1 FROM Countries WHERE name = ${record.country.name})
-          BEGIN
-              UPDATE Countries
-              SET regionName = ${record.country.regionName}
-              WHERE name = ${record.country.name}
-          END
-          `;
-
-            const newCity = await con.query`
-          IF NOT EXISTS (SELECT 1 FROM Cities WHERE name = ${record.city.name})
-          BEGIN
-              DECLARE @country_id uniqueidentifier;
-
-              SELECT @country_id = id FROM Countries WHERE name = ${record.country.name};
-
-              IF @country_id IS NOT NULL
-              BEGIN
-                INSERT INTO Cities (name, C40Status, countryID)
-                VALUES (${record.city.name}, ${record.city.C40Status == true ? 1 : 0}, @country_id)
-              END
-          END
-          `;
-
-            const newPopulation = await con.query`
-          IF NOT EXISTS (SELECT 1 FROM Populations WHERE cityID = (SELECT id FROM Cities WHERE name = ${record.city.name}))
-          BEGIN
-              DECLARE @city_id uniqueidentifier;
-
-              SELECT @city_id = id FROM Cities WHERE name = ${record.city.name};
-
-              IF @city_id IS NOT NULL
-              BEGIN
-                INSERT INTO Populations (count, year, cityID)
-                VALUES (${record.city.population.count}, ${record.city.population.year}, @city_id)
-              END
-          END
-          `;
+            const newPopulation = await Populations.create({
+              count: record.city.population.count,
+              year: record.city.population.year,
+              cityId: newCity._id,
+            });
 
             // create organisation
-            const newOrganisation = await con.query`
-              IF NOT EXISTS (SELECT 1 FROM Organisations WHERE accountNo = ${record.organisation.accountNo})
-              BEGIN
-                  DECLARE @city_id uniqueidentifier;
-                  DECLARE @country_id uniqueidentifier;
+            const newOrganisation = await Organisations.findOneAndUpdate(
+              { accountNo: record.organisation.accountNo },
+              {
+                $setOnInsert: {
+                  name: record.organisation.name,
+                  accountNo: record.organisation.accountNo,
+                  cityID: newCity._id,
+                  countryID: newCountry._id,
+                },
+              },
+              {
+                upsert: true,
+                new: true,
+              }
+            );
 
-                  SELECT @city_id = id FROM Cities WHERE name = ${record.city.name};
-                  SELECT @country_id = id FROM Countries WHERE name = ${record.country.name};
+            // create sector
+            const newSector = await Sectors.findOneAndUpdate(
+              { name: record.target.sector },
+              { $setOnInsert: { name: record.target.sector } },
+              { upsert: true, new: true }
+            );
 
-                  IF @country_id IS NOT NULL AND @city_id IS NOT NULL
-                  BEGIN
-                    INSERT INTO Organisations (name, accountNo, countryID, cityID)
-                    VALUES (${record.organisation.name}, ${record.organisation.accountNo}, @country_id, @city_id)
-                  END
-              END
-              `;
-
-            const newSector = await con.query`
-              IF NOT EXISTS (SELECT 1 FROM Sectors WHERE name = ${record.target.sector})
-              BEGIN
-                  INSERT INTO Sectors (name)
-                  VALUES (${record.target.sector})
-              END
-          `;
-
-            const newTargetType = await con.query`
-              IF NOT EXISTS (SELECT 1 FROM TargetTypes WHERE type = ${record.targetType.type})
-              BEGIN
-                  INSERT INTO TargetTypes (type)
-                  VALUES (${record.targetType.type})
-              END
-          `;
+            // new target type
+            const newTargetType = await TargetTypes.findOneAndUpdate(
+              { type: record.targetType.type },
+              { $setOnInsert: { type: record.targetType.type } },
+              { upsert: true, new: true }
+            );
 
             // create target
-            const newTarget = await con.query`
-            BEGIN
-                DECLARE @organisation_id uniqueidentifier;
-                DECLARE @sector_id uniqueidentifier;
-                DECLARE @targetType_id uniqueidentifier;
-
-                SELECT @organisation_id = id FROM Organisations WHERE accountNo = ${record.organisation.accountNo};
-                SELECT @sector_id = id FROM Sectors WHERE name = ${record.target.sector};
-                SELECT @targetType_id = id FROM TargetTypes WHERE type = ${record.targetType.type};
-
-                IF @organisation_id IS NOT NULL AND @sector_id IS NOT NULL
-                BEGIN
-                  INSERT INTO Targets (reportingYear, baselineYear, baselineEmissionsCO2, reductionTargetPercentage, targetYear, comment, organisationID, sectorID, targetTypeID)
-                  VALUES (${record.target.reportingYear}, ${record.target.baselineYear}, ${record.target.baselineEmissionsCO2}, ${record.target.reductionTargetPercentage}, ${record.target.targetYear}, ${record.target.comment}, @organisation_id, @sector_id, @targetType_id)
-                END
-            END
-            `;
+            await Targets.create({
+              reportingYear: record.target.reportingYear,
+              baselineYear: record.target.baselineYear,
+              targetYear: record.target.targetYear,
+              reductionTargetPercentage: record.target.reductionTargetPercentage,
+              baselineEmissionsCO2: record.target.baselineEmissionsCO2,
+              comment: record.target.comment,
+              organisationId: newOrganisation._id,
+              sectorId: newSector._id,
+              targetTypeId: newTargetType._id,
+            });
           }
 
           console.log("Scraper 2 done!");

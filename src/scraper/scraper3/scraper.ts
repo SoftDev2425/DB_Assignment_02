@@ -3,7 +3,7 @@ import { parse } from "csv-parse";
 import { format } from "date-fns";
 import * as path from "path";
 
-const scraper3 = async (con: any) => {
+const scraper3 = async () => {
   return new Promise((resolve, reject) => {
     const csvFilePath = path.resolve(__dirname, "2016_Citywide_GHG_Emissions_20240207.csv");
 

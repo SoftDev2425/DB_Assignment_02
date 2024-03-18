@@ -18,4 +18,6 @@ const organisationSchema = new Schema({
   },
 });
 
+organisationSchema.index({ name: 1 }, { unique: true }); // unique index on name
+
 export const Organisations = mongoose.model("organisations", organisationSchema);

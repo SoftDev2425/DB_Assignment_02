@@ -4,6 +4,7 @@ const citySchema = new Schema({
   name: {
     type: String,
     trim: true,
+    unique: true,
   },
   c40Status: {
     type: Boolean,
@@ -13,5 +14,7 @@ const citySchema = new Schema({
     ref: "countries",
   },
 });
+
+citySchema.index({ name: 1 }, { unique: true }); // unique index on name
 
 export const Cities = mongoose.model("cities", citySchema);
