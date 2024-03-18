@@ -5,12 +5,12 @@ import {
   getCitiesWithEmissionsRanking,
   getCityEmissionTargets,
   getContriesMostProminentGasses,
-  getTotalEmissionsByCity,
   getTotalEmissionsForRegions,
   getTotalEmissionsForCountries,
   getC40CitiesWithEmissions,
   getCitiesEmisions,
 } from "../services/emissions.service";
+import { getTotalEmissionsByCity } from "../functions/getTotalEmissionsByCity";
 
 interface Params {
   cityName: string;
@@ -23,38 +23,8 @@ export async function emissionRoutes(fastify: FastifyInstance) {
   // 1
   fastify.get("/total/:cityName", async function (request: FastifyRequest<{ Params: Params }>, reply: FastifyReply) {
     try {
-      const city = request.params.cityName;
-      const data = await getTotalEmissionsByCity(city.trim());
-
-      // return data.map((d) => {
-      //   return {
-      //     city: {
-      //       id: d.cityID,
-      //       name: d.cityName,
-      //       population: d.population,
-      //       c40Status: d.c40Status,
-      //     },
-      //     organisation: {
-      //       name: d.organisationName,
-      //       accountNo: d.organisationNo,
-      //     },
-      //     emission: {
-      //       id: d.emissionID,
-      //       reportingYear: d.reportingYear ? d.reportingYear : "N/A",
-      //       measurementYear: d.measurementYear ? d.measurementYear : "N/A",
-      //       total: d.total ? d.total : "N/A",
-      //       totalScope1Emission: d.totalScope1Emission ? d.totalScope1Emission : "N/A",
-      //       totalScope2Emission: d.totalScope2Emission ? d.totalScope2Emission : "N/A",
-      //       gassesIncluded: d.gassesIncluded ? d.gassesIncluded : "N/A",
-      //       methodology: d.methodology ? d.methodology : "N/A",
-      //       methodologyDetails: d.methodologyDetails ? d.methodologyDetails : "N/A",
-      //       change: d.type ? d.type : "N/A",
-      //       description: d.description ? d.description : "N/A",
-      //       comment: d.comment ? d.comment : "No comment",
-      //     },
-      //   };
-      // });
-      return data;
+      const city = request.params.cityName as string;
+      return await getTotalEmissionsByCity(city.trim());
     } catch (error) {
       fastify.log.error(error);
       reply.code(500).send({ error: "Failed getting total emissions. Please try again later." });
