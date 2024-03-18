@@ -6,10 +6,10 @@ const citySchema = new Schema({
     trim: true,
     unique: true,
   },
-  c40Status: {
+  C40Status: {
     type: Boolean,
   },
-  countryId: {
+  countryID: {
     type: Schema.Types.ObjectId,
     ref: "countries",
   },

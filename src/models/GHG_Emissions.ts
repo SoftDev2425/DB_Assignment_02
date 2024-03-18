@@ -40,14 +40,14 @@ const GHG_EmissionsSchema = new Schema({
   totalScope2_CO2: {
     type: Number,
   },
-  organisationId: {
+  organisationID: {
     type: Schema.Types.ObjectId,
     ref: "organisations",
   },
-  emissionStatusTypeId: {
+  emissionStatusTypeID: {
     type: Schema.Types.ObjectId,
     ref: "emissionStatusTypes",
   },
 });
 
-export const GHG_Emissions = mongoose.model("ghgEmissions", GHG_EmissionsSchema);
+export const GHG_Emissions = mongoose.model("GHG_emissions", GHG_EmissionsSchema);

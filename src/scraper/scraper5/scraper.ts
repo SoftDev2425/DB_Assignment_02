@@ -1,6 +1,8 @@
 import fs from "fs";
 import { parse } from "csv-parse";
 import * as path from "path";
+import { Questionnaires } from "../../models/questionnaires";
+import { Organisations } from "../../models/organisations";
 
 const scraper5 = async () => {
   return new Promise((resolve, reject) => {
@@ -18,7 +20,7 @@ const scraper5 = async () => {
       .on("data", (data) => {
         const obj: any = {};
 
-        const objData = JSON.stringify({
+        const objData = {
           city: data[3].trim(),
           country: data[4].trim(),
           population: data[16].trim(),
@@ -27,7 +29,7 @@ const scraper5 = async () => {
           CDP_Region: data[5].trim(),
           c40Status: data[6].trim() === "true" ? true : false,
           attachment: parseInt(data[9].trim()),
-        });
+        };
 
         obj.name = data[0].trim();
         obj.organisationNo = data[1].trim();
@@ -41,22 +43,15 @@ const scraper5 = async () => {
 
         try {
           for (const record of records) {
-            // NOTE: We are well aware that the transactions below can be done in a single transaction - we separated them for clarity
+            const organisation = await Organisations.findOne({ accountNo: record.organisationNo });
 
-            const addQuestionnaire = await con.query`
-            BEGIN
-              DECLARE @organisationID uniqueidentifier
-
-              SELECT @organisationID = ID FROM Organisations WHERE accountNo = ${record.organisationNo}
-
-
-              IF @organisationID IS NOT NULL
-              BEGIN
-                INSERT INTO Questionnaires (name, organisationID, data)
-                VALUES (${record.name}, @organisationID, ${record.data})
-              END
-            END
-          `;
+            if (organisation) {
+              await Questionnaires.create({
+                name: record.name,
+                organisationID: organisation._id,
+                data: record.data,
+              });
+            }
           }
 
           console.log("Scraper 5 done!");

@@ -2,6 +2,12 @@ import fs from "fs";
 import { parse } from "csv-parse";
 import { format } from "date-fns";
 import * as path from "path";
+import { Countries } from "../../models/countries";
+import { Cities } from "../../models/cities";
+import { Populations } from "../../models/populations";
+import { Organisations } from "../../models/organisations";
+import { EmissionStatusTypes } from "../../models/emissionStatusTypes";
+import { GHG_Emissions } from "../../models/GHG_Emissions";
 
 const scraper3 = async () => {
   return new Promise((resolve, reject) => {
@@ -70,88 +76,72 @@ const scraper3 = async () => {
 
         try {
           for (const record of records) {
-            // NOTE: We are well aware that the transactions below can be done in a single transaction - we separated them for clarity
+            // create country
+            const newCountry = await Countries.findOneAndUpdate(
+              { name: record.country.name },
+              { $setOnInsert: { name: record.country.name } },
+              { upsert: true, new: true }
+            );
 
-            const newCountry = await con.query`
-          IF NOT EXISTS (SELECT 1 FROM Countries WHERE name = ${record.country.name})
-          BEGIN
-              INSERT INTO Countries (name)
-              VALUES (${record.country.name});
-          END
-          `;
+            // create city
+            const newCity = await Cities.findOneAndUpdate(
+              { name: record.city.name },
+              {
+                $setOnInsert: {
+                  name: record.city.name,
+                  C40Status: record.city.C40Status,
+                  countryID: newCountry._id,
+                },
+              },
+              { upsert: true, new: true }
+            );
 
-            const newCity = await con.query`
-          IF NOT EXISTS (SELECT 1 FROM Cities WHERE name = ${record.city.name})
-          BEGIN
-              DECLARE @country_id uniqueidentifier;
-
-              SELECT @country_id = id FROM Countries WHERE name = ${record.country.name};
-
-              IF @country_id IS NOT NULL
-              BEGIN
-                INSERT INTO Cities (name, C40Status, countryID)
-                VALUES (${record.city.name}, ${record.city.C40Status == true ? 1 : 0}, @country_id)
-              END
-          END
-          `;
-
-            const newPopulation = await con.query`
-          IF NOT EXISTS (SELECT 1 FROM Populations WHERE cityID = (SELECT id FROM Cities WHERE name = ${record.city.name} AND year = ${record.city.population.year}))
-          BEGIN
-              DECLARE @city_id uniqueidentifier;
-
-              SELECT @city_id = id FROM Cities WHERE name = ${record.city.name};
-
-              IF @city_id IS NOT NULL
-              BEGIN
-                INSERT INTO Populations (count, year, cityID)
-                VALUES (${record.city.population.count}, ${record.city.population.year}, @city_id)
-              END
-          END
-          `;
+            // create population
+            const newPopulation = await Populations.create({
+              count: record.city.population.count,
+              year: record.city.population.year,
+              cityID: newCity._id,
+            });
 
             // create organisation
-            const newOrganisation = await con.query`
-              IF NOT EXISTS (SELECT 1 FROM Organisations WHERE accountNo = ${record.organisation.accountNo})
-              BEGIN
-                  DECLARE @city_id uniqueidentifier;
-                  DECLARE @country_id uniqueidentifier;
+            const newOrganisation = await Organisations.findOneAndUpdate(
+              { accountNo: record.organisation.accountNo },
+              {
+                $setOnInsert: {
+                  name: record.organisation.name,
+                  accountNo: record.organisation.accountNo,
+                  cityID: newCity._id,
+                  countryID: newCountry._id,
+                },
+              },
+              {
+                upsert: true,
+                new: true,
+              }
+            );
 
-                  SELECT @city_id = id FROM Cities WHERE name = ${record.city.name};
-                  SELECT @country_id = id FROM Countries WHERE name = ${record.country.name};
+            // create emissionStatusType
+            const newEmissionStatusType = await EmissionStatusTypes.findOneAndUpdate(
+              { type: record.emissionStatusTypes.type },
+              { $setOnInsert: { type: record.emissionStatusTypes.type } },
+              { upsert: true, new: true }
+            );
 
-                  IF @country_id IS NOT NULL AND @city_id IS NOT NULL
-                  BEGIN
-                    INSERT INTO Organisations (name, accountNo, countryID, cityID)
-                    VALUES (${record.organisation.name}, ${record.organisation.accountNo}, @country_id, @city_id)
-                  END
-              END
-              `;
-
-            const newEmissionStatusType = await con.query`
-              IF NOT EXISTS (SELECT 1 FROM EmissionStatusTypes WHERE type = ${record.emissionStatusTypes.type})
-              BEGIN
-                  INSERT INTO EmissionStatusTypes (type)
-                  VALUES (${record.emissionStatusTypes.type})
-              END
-          `;
-
-            // CREATES GHG_EmissionStatus AND new GHG_Emission
-            const newGHG_Emission = await con.query`
-              BEGIN
-                DECLARE @organisation_id uniqueidentifier;
-                DECLARE @emissionStatusType_id uniqueidentifier;
-
-                SELECT @emissionStatusType_id = id FROM EmissionStatusTypes WHERE type = ${record.emissionStatusTypes.type};
-                SELECT @organisation_id = id FROM Organisations WHERE accountNo = ${record.organisation.accountNo};
-
-                IF @organisation_id IS NOT NULL AND @emissionStatusType_id IS NOT NULL
-                BEGIN
-                    INSERT INTO GHG_Emissions (reportingYear, measurementYear, boundary, methodology, methodologyDetails, description, gassesIncluded, totalCityWideEmissionsCO2, totalScope1_CO2, totalScope2_CO2, organisationID, emissionStatusTypeID)
-                    VALUES (${record.GHG_emissions.reportingYear}, ${record.GHG_emissions.measurementYear}, ${record.GHG_emissions.boundary}, ${record.GHG_emissions.methodology}, ${record.GHG_emissions.methodologyDetails}, ${record.GHG_emissions.description}, ${record.GHG_emissions.gassesIncluded}, ${record.GHG_emissions.totalCityWideEmissionsCO2}, ${record.GHG_emissions.totalScope1CO2}, ${record.GHG_emissions.totalScope2CO2}, @organisation_id, @emissionStatusType_id)
-                END
-              END
-          `;
+            // create new GHG_EmissionStatus
+            await GHG_Emissions.create({
+              reportingYear: record.GHG_emissions.reportingYear,
+              measurementYear: record.GHG_emissions.measurementYear,
+              boundary: record.GHG_emissions.boundary,
+              methodology: record.GHG_emissions.methodology,
+              methodologyDetails: record.GHG_emissions.methodologyDetails,
+              description: record.GHG_emissions.description,
+              gassesIncluded: record.GHG_emissions.gassesIncluded,
+              totalCityWideEmissionsCO2: record.GHG_emissions.totalCityWideEmissionsCO2,
+              totalScope1_CO2: record.GHG_emissions.totalScope1CO2,
+              totalScope2_CO2: record.GHG_emissions.totalScope2CO2,
+              organisationID: newOrganisation._id,
+              emissionStatusTypeID: newEmissionStatusType._id,
+            });
           }
 
           console.log("Scraper 3 done!");

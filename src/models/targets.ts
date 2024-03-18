@@ -19,15 +19,15 @@ const targetSchema = new Schema({
   comment: {
     type: String,
   },
-  organisationId: {
+  organisationID: {
     type: Schema.Types.ObjectId,
     ref: "organisations",
   },
-  sectorId: {
+  sectorID: {
     type: Schema.Types.ObjectId,
     ref: "sectors",
   },
-  targetTypeId: {
+  targetTypeID: {
     type: Schema.Types.ObjectId,
     ref: "targetTypes",
   },

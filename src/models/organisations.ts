@@ -8,11 +8,11 @@ const organisationSchema = new Schema({
     type: String,
     trim: true,
   },
-  cityId: {
+  cityID: {
     type: Schema.Types.ObjectId,
     ref: "cities",
   },
-  countryId: {
+  countryID: {
     type: Schema.Types.ObjectId,
     ref: "countries",
   },

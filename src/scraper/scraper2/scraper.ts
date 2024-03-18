@@ -73,10 +73,10 @@ const scraper2 = async () => {
         try {
           for (const record of records) {
             // create country
-            const newCountry = await Countries.findOneAndUpdate(
+            const newCountry = await Countries.updateOne(
               { name: record.country.name },
-              { $setOnInsert: { name: record.country.name, regionName: record.country.regionName } },
-              { upsert: true, new: true }
+              { $set: { name: record.country.name, regionName: record.country.regionName } },
+              { upsert: true }
             );
 
             // create city
@@ -86,7 +86,7 @@ const scraper2 = async () => {
                 $setOnInsert: {
                   name: record.city.name,
                   C40Status: record.city.C40Status,
-                  countryID: newCountry._id,
+                  countryID: newCountry.upsertedId ? newCountry.upsertedId._id : undefined,
                 },
               },
               { upsert: true, new: true }
@@ -95,7 +95,7 @@ const scraper2 = async () => {
             const newPopulation = await Populations.create({
               count: record.city.population.count,
               year: record.city.population.year,
-              cityId: newCity._id,
+              cityID: newCity._id,
             });
 
             // create organisation
@@ -106,7 +106,7 @@ const scraper2 = async () => {
                   name: record.organisation.name,
                   accountNo: record.organisation.accountNo,
                   cityID: newCity._id,
-                  countryID: newCountry._id,
+                  countryID: newCountry.upsertedId ? newCountry.upsertedId._id : undefined,
                 },
               },
               {
@@ -137,9 +137,9 @@ const scraper2 = async () => {
               reductionTargetPercentage: record.target.reductionTargetPercentage,
               baselineEmissionsCO2: record.target.baselineEmissionsCO2,
               comment: record.target.comment,
-              organisationId: newOrganisation._id,
-              sectorId: newSector._id,
-              targetTypeId: newTargetType._id,
+              organisationID: newOrganisation._id,
+              sectorID: newSector._id,
+              targetTypeID: newTargetType._id,
             });
           }
 

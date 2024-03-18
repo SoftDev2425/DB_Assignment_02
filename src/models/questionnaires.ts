@@ -6,10 +6,10 @@ const questionnairesSchema = new Schema({
     trim: true,
   },
   data: {
-    type: String,
+    type: Object,
     trim: true,
   },
-  organisationId: {
+  organisationID: {
     type: Schema.Types.ObjectId,
     ref: "organisations",
   },

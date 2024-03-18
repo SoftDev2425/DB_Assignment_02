@@ -7,7 +7,7 @@ const populationSchema = new Schema({
   year: {
     type: Number,
   },
-  cityId: {
+  cityID: {
     type: Schema.Types.ObjectId,
     ref: "cities",
   },

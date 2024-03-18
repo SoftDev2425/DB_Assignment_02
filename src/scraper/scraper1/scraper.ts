@@ -112,8 +112,8 @@ const scraper1 = async () => {
               reductionTargetPercentage: record.target.reductionTargetPercentage,
               baselineEmissionsCO2: record.target.baselineEmissionsCO2,
               comment: record.target.comment,
-              organisationId: newOrganisation.id,
-              sectorId: newSector.id,
+              organisationID: newOrganisation.id,
+              sectorID: newSector.id,
             });
           }
 
