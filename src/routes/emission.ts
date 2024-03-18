@@ -4,13 +4,13 @@ import {
   getCitiesByStatusType,
   getCitiesWithEmissionsRanking,
   getCityEmissionTargets,
-  getContriesMostProminentGasses,
   getTotalEmissionsForRegions,
   getTotalEmissionsForCountries,
   getC40CitiesWithEmissions,
   getCitiesEmisions,
 } from "../services/emissions.service";
 import { getTotalEmissionsByCity } from "../functions/getTotalEmissionsByCity";
+import { getCountriesMostProminentGasses } from "../functions/getCountriesMostProminentGasses";
 
 interface Params {
   cityName: string;
@@ -279,20 +279,23 @@ export async function emissionRoutes(fastify: FastifyInstance) {
   // 10
   fastify.get("/countries/gas", async function (request, reply: FastifyReply) {
     try {
-      // const data = await getContriesMostProminentGasses();
-      // return data.map((d) => {
-      //   return {
-      //     countryName: d.CountryName,
-      //     gasses: Array.from(
-      //       new Set(
-      //         d.Gasses.trim()
-      //           .split(/[;\s]+/)
-      //           .map((g: string) => g.trim())
-      //       )
-      //     ).join("; "),
-      //   };
-      // });
-      return "hi";
+      const data = await getCountriesMostProminentGasses();
+      console.log(data);
+      
+      return data.map((d) => {
+        return {
+          id: d.id,
+          countryName: d.countryName,
+          gasses: Array.from(
+            new Set(
+              d.gasses.trim()
+                .split(/[;\s]+/)
+                .map((g: string) => g.trim())
+            )
+          ).join("; "),
+        };
+      });
+
     } catch (error) {
       fastify.log.error(error);
       reply.code(500).send({ error: "Failed getting prominent gasses. Please try again later." });
