@@ -43,7 +43,7 @@ npm install
 Create or run a mongo database instance. The following is a quick example:
 
 - Launch Docker Desktop
-- Create a `mongo.yaml` file locally with the following content
+- Create a `mongo.yaml` file locally with the following content:
 
 ```
 version: "3.1"
@@ -62,7 +62,7 @@ volumes:
 
 - Open a terminal in the directory you created the file and run `docker-compose up -d mongo.yaml`
 
-Now you should have a mongo instance running. <br>
+Great! Now you should have a mongo instance running. <br> <br>
 NOTE: By default our mongo connection is done on port `27017`. If you run on any other ports then remember to change the connection string in `src/server.ts` and `src/scraper/index.ts`.
 
 ### Step 4: Run data scraper
