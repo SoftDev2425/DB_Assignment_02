@@ -79,55 +79,79 @@ const scraper2 = async () => {
               { upsert: true }
             );
 
+            // Capture the country id
+            const countryId = newCountry.upsertedId
+              ? newCountry.upsertedId._id
+              : (await Countries.findOne({ name: record.country.name }))?._id;
+
             // create city
-            const newCity = await Cities.findOneAndUpdate(
+            const newCity = await Cities.updateOne(
               { name: record.city.name },
               {
                 $setOnInsert: {
                   name: record.city.name,
                   C40Status: record.city.C40Status,
-                  country_id: newCountry.upsertedId ? newCountry.upsertedId._id : undefined,
+                  country_id: countryId,
                 },
               },
-              { upsert: true, new: true }
+              { upsert: true }
             );
+
+            // Capture the city id
+            const cityId = newCity.upsertedId
+              ? newCity.upsertedId._id
+              : (await Cities.findOne({ name: record.city.name }))?._id;
 
             const newPopulation = await Populations.create({
               count: record.city.population.count,
               year: record.city.population.year,
-              city_id: newCity._id,
+              city_id: cityId,
             });
 
             // create organisation
-            const newOrganisation = await Organisations.findOneAndUpdate(
+            const newOrganisation = await Organisations.updateOne(
               { accountNo: record.organisation.accountNo },
               {
                 $setOnInsert: {
                   name: record.organisation.name,
                   accountNo: record.organisation.accountNo,
-                  city_id: newCity._id,
-                  country_id: newCountry.upsertedId ? newCountry.upsertedId._id : undefined,
+                  city_id: cityId,
+                  country_id: countryId,
                 },
               },
               {
                 upsert: true,
-                new: true,
               }
             );
 
+            // capture the organisation id
+            const organisationId = newOrganisation.upsertedId
+              ? newOrganisation.upsertedId._id
+              : (await Organisations.findOne({ accountNo: record.organisation.accountNo }))?._id;
+
             // create sector
-            const newSector = await Sectors.findOneAndUpdate(
+            const newSector = await Sectors.updateOne(
               { name: record.target.sector },
               { $setOnInsert: { name: record.target.sector } },
-              { upsert: true, new: true }
+              { upsert: true }
             );
 
             // new target type
-            const newTargetType = await TargetTypes.findOneAndUpdate(
+            const newTargetType = await TargetTypes.updateOne(
               { type: record.targetType.type },
               { $setOnInsert: { type: record.targetType.type } },
-              { upsert: true, new: true }
+              { upsert: true }
             );
+
+            // Capture the sector id
+            const sectorId = newSector.upsertedId
+              ? newSector.upsertedId._id
+              : (await Sectors.findOne({ name: record.target.sector }))?._id;
+
+            // Capture the target type id
+            const targetTypeId = newTargetType.upsertedId
+              ? newTargetType.upsertedId._id
+              : (await TargetTypes.findOne({ type: record.targetType.type }))?._id;
 
             // create target
             await Targets.create({
@@ -137,9 +161,9 @@ const scraper2 = async () => {
               reductionTargetPercentage: record.target.reductionTargetPercentage,
               baselineEmissionsCO2: record.target.baselineEmissionsCO2,
               comment: record.target.comment,
-              organisation_id: newOrganisation._id,
-              sector_id: newSector._id,
-              targetType_id: newTargetType._id,
+              organisation_id: organisationId,
+              sector_id: sectorId,
+              targetType_id: targetTypeId,
             });
           }
 
