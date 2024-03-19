@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import Cities from "../models/cities";
 import Countries from "../models/countries";
 
@@ -20,6 +21,9 @@ export const GetAvgEmissionForC40AndNonC40 = async () => {
     throw error;
   }
 };
+=======
+
+>>>>>>> master
 
 // 4 - Owais
 export const getCityEmissionTargets = async (city: string) => {

@@ -77,55 +77,74 @@ const scraper3 = async () => {
         try {
           for (const record of records) {
             // create country
-            const newCountry = await Countries.findOneAndUpdate(
+            const newCountry = await Countries.updateOne(
               { name: record.country.name },
               { $setOnInsert: { name: record.country.name } },
-              { upsert: true, new: true }
+              { upsert: true }
             );
 
+            // Capture the country id
+            const countryId = newCountry.upsertedId
+              ? newCountry.upsertedId._id
+              : (await Countries.findOne({ name: record.country.name }))?._id;
+
             // create city
-            const newCity = await Cities.findOneAndUpdate(
+            const newCity = await Cities.updateOne(
               { name: record.city.name },
               {
                 $setOnInsert: {
                   name: record.city.name,
                   C40Status: record.city.C40Status,
-                  country_id: newCountry._id,
+                  country_id: countryId,
                 },
               },
-              { upsert: true, new: true }
+              { upsert: true }
             );
+
+            // capture the city id
+            const cityId = newCity.upsertedId
+              ? newCity.upsertedId._id
+              : (await Cities.findOne({ name: record.city.name }))?._id;
 
             // create population
             const newPopulation = await Populations.create({
               count: record.city.population.count,
               year: record.city.population.year,
-              city_id: newCity._id,
+              city_id: cityId,
             });
 
             // create organisation
-            const newOrganisation = await Organisations.findOneAndUpdate(
+            const newOrganisation = await Organisations.updateOne(
               { accountNo: record.organisation.accountNo },
               {
                 $setOnInsert: {
                   name: record.organisation.name,
                   accountNo: record.organisation.accountNo,
-                  city_id: newCity._id,
-                  country_id: newCountry._id,
+                  city_id: cityId,
+                  country_id: countryId,
                 },
               },
               {
                 upsert: true,
-                new: true,
               }
             );
 
+            // capture the organisation id
+            const organisationId = newOrganisation.upsertedId
+              ? newOrganisation.upsertedId._id
+              : (await Organisations.findOne({ accountNo: record.organisation.accountNo }))?._id;
+
             // create emissionStatusType
-            const newEmissionStatusType = await EmissionStatusTypes.findOneAndUpdate(
+            const newEmissionStatusType = await EmissionStatusTypes.updateOne(
               { type: record.emissionStatusTypes.type },
               { $setOnInsert: { type: record.emissionStatusTypes.type } },
-              { upsert: true, new: true }
+              { upsert: true }
             );
+
+            // capture the emissionStatusType id
+            const emissionStatusTypeId = newEmissionStatusType.upsertedId
+              ? newEmissionStatusType.upsertedId._id
+              : (await EmissionStatusTypes.findOne({ type: record.emissionStatusTypes.type }))?._id;
 
             // create new GHG_EmissionStatus
             await GHG_Emissions.create({
@@ -139,8 +158,8 @@ const scraper3 = async () => {
               totalCityWideEmissionsCO2: record.GHG_emissions.totalCityWideEmissionsCO2,
               totalScope1_CO2: record.GHG_emissions.totalScope1CO2,
               totalScope2_CO2: record.GHG_emissions.totalScope2CO2,
-              organisation_id: newOrganisation._id,
-              emissionStatusType_id: newEmissionStatusType._id,
+              organisation_id: organisationId,
+              emissionStatusType_id: emissionStatusTypeId,
             });
           }
 
