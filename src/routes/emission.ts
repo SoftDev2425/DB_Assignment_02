@@ -1,5 +1,6 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { getTotalEmissionsByCity } from "../functions/getTotalEmissionsByCity";
+import { getCountriesMostProminentGasses } from "../functions/getCountriesMostProminentGasses";
 import { getCitiesByStatusType } from "../functions/getCitiesByStatusType";
 import { getAvgEmissionForC40AndNonC40 } from "../functions/getAvgEmissionForC40AndNonC40";
 import { getCityEmissionTargets } from "../functions/getCityEmissionTargets";
@@ -219,26 +220,29 @@ export async function emissionRoutes(fastify: FastifyInstance) {
   //     }
   //   });
 
-  //   // 10
-  //   fastify.get("/countries/gas", async function (request, reply: FastifyReply) {
-  //     try {
-  //       // const data = await getContriesMostProminentGasses();
-  //       // return data.map((d) => {
-  //       //   return {
-  //       //     countryName: d.CountryName,
-  //       //     gasses: Array.from(
-  //       //       new Set(
-  //       //         d.Gasses.trim()
-  //       //           .split(/[;\s]+/)
-  //       //           .map((g: string) => g.trim())
-  //       //       )
-  //       //     ).join("; "),
-  //       //   };
-  //       // });
-  //       return "hi";
-  //     } catch (error) {
-  //       fastify.log.error(error);
-  //       reply.code(500).send({ error: "Failed getting prominent gasses. Please try again later." });
-  //     }
-  //   });
+  // 10
+  fastify.get("/countries/gas", async function (request, reply: FastifyReply) {
+    try {
+      const data = await getCountriesMostProminentGasses();
+      console.log(data);
+      
+      return data.map((d) => {
+        return {
+          id: d.id,
+          countryName: d.countryName,
+          gasses: Array.from(
+            new Set(
+              d.gasses.trim()
+                .split(/[;\s]+/)
+                .map((g: string) => g.trim())
+            )
+          ).join("; "),
+        };
+      });
+
+    } catch (error) {
+      fastify.log.error(error);
+      reply.code(500).send({ error: "Failed getting prominent gasses. Please try again later." });
+    }
+  });
 }
