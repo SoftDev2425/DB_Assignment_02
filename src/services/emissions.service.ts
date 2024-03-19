@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import Cities from "../models/cities";
 import Countries from "../models/countries";
 
@@ -21,9 +20,6 @@ export const GetAvgEmissionForC40AndNonC40 = async () => {
     throw error;
   }
 };
-=======
-
->>>>>>> master
 
 // 4 - Owais
 export const getCityEmissionTargets = async (city: string) => {
@@ -80,13 +76,12 @@ export const getTotalEmissionsForRegions = async () => {
   }
 };
 
-// 9 - Andreas
-export const getTotalEmissionsForCountries = async () => {
+// 10 - Andreas
+export const getContriesMostProminentGasses = async () => {
   try {
-    return "Hello from getTotalEmissionsForCountries!";
+    return "Hello from getContriesMostProminentGasses!";
   } catch (error) {
     console.error("Error:", error);
     throw error;
   }
 };
-

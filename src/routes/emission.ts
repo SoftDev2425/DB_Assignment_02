@@ -1,5 +1,6 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { getTotalEmissionsByCity } from "../functions/getTotalEmissionsByCity";
+import { getTotalEmissionsForCountries } from "../functions/getTotalEmissionsForCountries";
 import { getCountriesMostProminentGasses } from "../functions/getCountriesMostProminentGasses";
 import { getCitiesByStatusType } from "../functions/getCitiesByStatusType";
 import { getAvgEmissionForC40AndNonC40 } from "../functions/getAvgEmissionForC40AndNonC40";
@@ -202,23 +203,15 @@ export async function emissionRoutes(fastify: FastifyInstance) {
   //     }
   //   });
 
-  //   // 9
-  //   fastify.get("/countries", async function (request, reply: FastifyReply) {
-  //     try {
-  //       const data = await getTotalEmissionsForCountries();
-  //       // return {
-  //       //   countries: data.map((d) => ({
-  //       //     id: d.CountryID,
-  //       //     name: d.CountryName ? d.CountryName : "N/A",
-  //       //     totalEmission: d.TotalEmissions.toLocaleString() ? d.TotalEmissions.toLocaleString() : "N/A",
-  //       //   })),
-  //       // };
-  //       return "hi";
-  //     } catch (error) {
-  //       fastify.log.error(error);
-  //       reply.code(500).send({ error: "Failed getting all countries' total emissions. Please try again later." });
-  //     }
-  //   });
+  // 9
+  fastify.get("/countries", async function (request, reply: FastifyReply) {
+    try {
+      return await getTotalEmissionsForCountries();
+    } catch (error) {
+      fastify.log.error(error);
+      reply.code(500).send({ error: "Failed getting all countries' total emissions. Please try again later." });
+    }
+  });
 
   // 10
   fastify.get("/countries/gas", async function (request, reply: FastifyReply) {
