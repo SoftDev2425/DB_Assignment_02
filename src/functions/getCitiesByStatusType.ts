@@ -49,7 +49,7 @@ export const getCitiesByStatusType = async (statusType: string) => {
             C40Status: false,
           },
           emission: {
-            change: statusType,
+            change: status.type,
             reportingYear: emission.reportingYear,
             measurementYear: emission.measurementYear,
             boundary: emission.boundary,
