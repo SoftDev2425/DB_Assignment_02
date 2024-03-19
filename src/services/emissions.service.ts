@@ -1,32 +1,4 @@
-// // 2 - Owais
-// export const getCitiesByStatusType = async (statusType: string) => {
-//   try {
-//     return "Hello from getCitiesByStatusType!";
-//   } catch (error) {
-//     console.error("Error:", error);
-//     throw error;
-//   }
-// };
 
-// // 3 - Owais
-// export const GetAvgEmissionForC40AndNonC40 = async () => {
-//   try {
-//     return "Hello from GetAvgEmissionForC40AndNonC40!";
-//   } catch (error) {
-//     console.error("Error:", error);
-//     throw error;
-//   }
-// };
-
-// // 4 - Owais
-// export const getCityEmissionTargets = async (city: string) => {
-//   try {
-//     return "Hello from getCityEmissionTargets!";
-//   } catch (error) {
-//     console.error("Error:", error);
-//     throw error;
-//   }
-// };
 
 // // 5 - Rasmus
 // export const getCitiesWithEmissionsRanking = async (statusType: "ASC" | "DESC" = "DESC") => {
