@@ -61,48 +61,67 @@ const scraper1 = async () => {
         try {
           for (const record of records) {
             // create country
-            const newCountry = await Countries.findOneAndUpdate(
+            const newCountry = await Countries.updateOne(
               { name: record.country.name },
               { $setOnInsert: { name: record.country.name } },
-              { upsert: true, new: true }
+              { upsert: true }
             );
 
+            // Capture the country id
+            const countryId = newCountry.upsertedId
+              ? newCountry.upsertedId._id
+              : (await Countries.findOne({ name: record.country.name }))?._id;
+
             // create city
-            const newCity = await Cities.findOneAndUpdate(
+            const newCity = await Cities.updateOne(
               { name: record.city.name },
               {
                 $setOnInsert: {
                   name: record.city.name,
                   C40Status: record.city.C40Status,
-                  country_id: newCountry._id,
+                  country_id: countryId,
                 },
               },
-              { upsert: true, new: true }
+              { upsert: true }
             );
 
+            // Capture the city id
+            const cityId = newCity.upsertedId
+              ? newCity.upsertedId._id
+              : (await Cities.findOne({ name: record.city.name }))?._id;
+
             // create organisation
-            const newOrganisation = await Organisations.findOneAndUpdate(
+            const newOrganisation = await Organisations.updateOne(
               { accountNo: record.organisation.accountNo },
               {
                 $setOnInsert: {
                   name: record.organisation.name,
                   accountNo: record.organisation.accountNo,
-                  city_id: newCity.id,
-                  country_id: newCountry.id,
+                  city_id: cityId,
+                  country_id: countryId,
                 },
               },
               {
                 upsert: true,
-                new: true,
               }
             );
 
+            // capture the organisation id
+            const organisationId = newOrganisation.upsertedId
+              ? newOrganisation.upsertedId._id
+              : (await Organisations.findOne({ accountNo: record.organisation.accountNo }))?._id;
+
             // create sector
-            const newSector = await Sectors.findOneAndUpdate(
+            const newSector = await Sectors.updateOne(
               { name: record.target.sector },
               { $setOnInsert: { name: record.target.sector } },
-              { upsert: true, new: true }
+              { upsert: true }
             );
+
+            // Capture the sector id
+            const sectorId = newSector.upsertedId
+              ? newSector.upsertedId._id
+              : (await Sectors.findOne({ name: record.target.sector }))?._id;
 
             // create target
             await Targets.create({
@@ -112,8 +131,8 @@ const scraper1 = async () => {
               reductionTargetPercentage: record.target.reductionTargetPercentage,
               baselineEmissionsCO2: record.target.baselineEmissionsCO2,
               comment: record.target.comment,
-              organisation_id: newOrganisation.id,
-              sector_id: newSector.id,
+              organisation_id: organisationId,
+              sector_id: sectorId,
             });
           }
 

@@ -2,6 +2,7 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { getTotalEmissionsByCity } from "../functions/getTotalEmissionsByCity";
 import { getCitiesByStatusType } from "../functions/getCitiesByStatusType";
 import { getAvgEmissionForC40AndNonC40 } from "../functions/getAvgEmissionForC40AndNonC40";
+import { getCityEmissionTargets } from "../functions/getCityEmissionTargets";
 
 interface Params {
   cityName: string;
@@ -43,42 +44,16 @@ export async function emissionRoutes(fastify: FastifyInstance) {
     }
   });
 
-  //   // 4
-  //   fastify.get("/targets/:cityName", async function (request: FastifyRequest<{ Params: Params }>, reply: FastifyReply) {
-  //     try {
-  //       const city = request.params.cityName;
-  //       const data = await getCityEmissionTargets(city);
-  //       console.log(data);
-  //       // return data.map((d) => {
-  //       //   return {
-  //       //     city: {
-  //       //       id: d.cityID,
-  //       //       name: d.cityName,
-  //       //       population: d.population,
-  //       //       c40Status: d.c40Status,
-  //       //     },
-  //       //     organisation: {
-  //       //       name: d.organisationName,
-  //       //       accountNo: d.organisationNo,
-  //       //     },
-  //       //     target: {
-  //       //       id: d.targetID,
-  //       //       sector: d.sectorName ? d.sectorName : "N/A",
-  //       //       reportingYear: d.reportingYear ? d.reportingYear : "N/A",
-  //       //       baselineYear: d.baselineYear ? d.baselineYear : "N/A",
-  //       //       targetYear: d.targetYear ? d.targetYear : "N/A",
-  //       //       reductionTargetPercentage: d.reductionTargetPercentage ? d.reductionTargetPercentage : "N/A",
-  //       //       baselineEmissionsCO2: d.baselineEmissionsCO2 ? d.baselineEmissionsCO2 : "N/A",
-  //       //       comment: d.comment ? d.comment : "No comment",
-  //       //     },
-  //       //   };
-  //       // });
-  //       return data;
-  //     } catch (error: any) {
-  //       fastify.log.error(error);
-  //       reply.code(500).send({ error: error.message });
-  //     }
-  //   });
+  // 4
+  fastify.get("/targets/:cityName", async function (request: FastifyRequest<{ Params: Params }>, reply: FastifyReply) {
+    try {
+      const city = request.params.cityName;
+      return await getCityEmissionTargets(city);
+    } catch (error: any) {
+      fastify.log.error(error);
+      reply.code(500).send({ error: error.message });
+    }
+  });
 
   //   // 5
   //   fastify.get("/ranked/:sortBy?", async function (request: FastifyRequest<{ Params: Params }>, reply: FastifyReply) {

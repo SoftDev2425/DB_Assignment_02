@@ -1,16 +1,5 @@
 
 
-
-// // 4 - Owais
-// export const getCityEmissionTargets = async (city: string) => {
-//   try {
-//     return "Hello from getCityEmissionTargets!";
-//   } catch (error) {
-//     console.error("Error:", error);
-//     throw error;
-//   }
-// };
-
 // // 5 - Rasmus
 // export const getCitiesWithEmissionsRanking = async (statusType: "ASC" | "DESC" = "DESC") => {
 //   try {
