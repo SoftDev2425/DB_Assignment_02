@@ -192,15 +192,15 @@ export async function emissionRoutes(fastify: FastifyInstance) {
   //     }
   //   });
 
-  //   // 8
-  //   fastify.get("/regions", async function (request, reply: FastifyReply) {
-  //     try {
-  //       return await getTotalEmissionsForRegions();
-  //     } catch (error) {
-  //       fastify.log.error(error);
-  //       reply.code(500).send({ error: "Failed getting regions' emissions. Please try again later." });
-  //     }
-  //   });
+    // 8
+    fastify.get("/regions", async function (request, reply: FastifyReply) {
+      try {
+        return await getTotalEmissionsForRegions();
+      } catch (error) {
+        fastify.log.error(error);
+        reply.code(500).send({ error: "Failed getting regions' emissions. Please try again later." });
+      }
+    });
 
   //   // 9
   //   fastify.get("/countries", async function (request, reply: FastifyReply) {

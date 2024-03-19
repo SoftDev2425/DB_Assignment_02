@@ -11,29 +11,40 @@ export const getTotalEmissionsForRegions = async () => {
         
         const regions = await GHG_Emissions.aggregate([
             {
-              $match: { reportingYear: newestReportingYear },
+              $match: { reportingYear: newestReportingYear }
             },
             {
               $lookup: {
                 from: 'organisations',
                 localField: 'organisation_id',
                 foreignField: '_id',
-                as: 'organisation',
-              },
+                as: 'organisation'
+              }
             },
             {
               $lookup: {
                 from: 'countries',
                 localField: 'organisation.country_id',
                 foreignField: '_id',
-                as: 'country',
-              },
+                as: 'country'
+              }
             },
             {
               $group: {
                 _id: '$country.regionName',
-                TotalEmissions: { $sum: '$totalCityWideEmissionsCO2' },
-              },
+                name: { $first: '$country.regionName' },
+                totalEmissions: { $sum: '$totalCityWideEmissionsCO2' }
+              }
+            },
+            {
+              $unwind: '$name'
+            },
+            {
+              $project: {
+                _id: 0,
+                name: 1,
+                totalEmissions: 1
+              }
             },
           ]);
           
