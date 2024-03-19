@@ -1,6 +1,3 @@
-import Cities from "../models/cities";
-import Countries from "../models/countries";
-
 // 2 - Owais
 export const getCitiesByStatusType = async (statusType: string) => {
   try {
