@@ -1,4 +1,6 @@
-# DB Assignment 1
+# DB Assignment 2
+
+Using MongoDB + mongoose
 
 ## Table of content
 
@@ -16,14 +18,16 @@ Group E:
 
 Our plan involved developing a simple server where the developer can access it,
 enabling interaction with the underlying database layer through various procedures
-corresponding to our 10 relevant questions to the given datasets ([found here](https://github.com/SoftDev2425/DB_Assignment_01/tree/master/src/scraper/data)). Read the report [here](https://typst.app/project/r-3FsUMzydTBaRJdngSmSY).
+corresponding to our 10 relevant questions to the given datasets ([found here](https://github.com/SoftDev2425/DB_Assignment_02/tree/master/src/scraper/data)). <br>
+
+- [First assignment done using sql](https://github.com/SoftDev2425/DB_Assignment_01)
 
 ## How to run
 
 ### Step 1: Clone the project
 
 ```
-git clone https://github.com/SoftDev2425/DB_Assignment_01.git
+git clone https://github.com/SoftDev2425/DB_Assignment_02.git
 ```
 
 ### Step 2: Install dependencies
@@ -36,31 +40,40 @@ npm install
 
 ### Step 3: Configure DB-connection
 
-1. Create a new database
-2. Under the folder `src/utils/db` create a copy of the file `dbConnection.template.ts` and rename it to `dbConnection.ts`
-3. In the file `dbConnection.ts` apply your own database configuration (we are well aware that .env could potentialy be a better solution, but they can't be loaded when running ts-node in the upcoming way).
-   <br>Add the following values to the `mssqlConfig`-object:
-   - **database** (database name)
-   - **user** (database username)
-   - **password** (database password)
+Create or run a mongo database instance. The following is a quick example:
 
-### Step 4: Run database scripts + add data + stored procedures
+- Launch Docker Desktop
+- Create a `mongo.yaml` file locally with the following content:
 
-1. Firstly copy the content of the `table.sql` script found [HERE](https://github.com/SoftDev2425/DB_Assignment_01/blob/master/sql/tables.sql) and execute it in your own database.
+```
+version: "3.1"
+services:
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - 27017:27017
+    volumes:
+      - ./docker-data/mongo:/data/db
+volumes:
+  docker-data:
+    external: true
+```
 
-2. Secondly, to add data to the database, open a new terminal and run
+- Open a terminal in the directory you created the file and run `docker-compose up -d mongo.yaml`
+
+Great! Now you should have a mongo instance running. <br> <br>
+NOTE: By default our mongo connection is done on port `27017`. If you run on any other ports then remember to change the connection string in `src/server.ts` and `src/scraper/index.ts`.
+
+### Step 4: Run data scraper
+
+To add data data to the database, open a new terminal and run
 
 ```
 npm run scrape
 ```
 
 This will read the data from all .csv-files and add them to your database.
-
-3. Now it's time to create the stored procedures. For this simply run
-
-```
-npm run sp
-```
 
 Now you should be ready to explore the data via our API.
 
