@@ -1,7 +1,7 @@
 import Cities from "../models/cities";
-import Organisations from "../models/organisations";
 import GHG_Emissions from "../models/GHG_Emissions";
 
+// 5
 export const getCitiesWithEmissionsRanking = async (order: string) => {
   const sortOrder: 1 | -1 = order.toUpperCase() === "ASC" ? 1 : -1;
 
@@ -35,10 +35,7 @@ export const getCitiesWithEmissionsRanking = async (order: string) => {
             {
               $match: {
                 $expr: {
-                  $and: [
-                    { $eq: ["$organisation_id", "$$orgId"] },
-                    { $eq: ["$reportingYear", "$$recentYear"] },
-                  ],
+                  $and: [{ $eq: ["$organisation_id", "$$orgId"] }, { $eq: ["$reportingYear", "$$recentYear"] }],
                 },
               },
             },
@@ -61,11 +58,7 @@ export const getCitiesWithEmissionsRanking = async (order: string) => {
         $lookup: {
           from: "populations",
           let: { cityId: "$_id" },
-          pipeline: [
-            { $match: { $expr: { $eq: ["$city_id", "$$cityId"] } } },
-            { $sort: { year: -1 } },
-            { $limit: 1 },
-          ],
+          pipeline: [{ $match: { $expr: { $eq: ["$city_id", "$$cityId"] } } }, { $sort: { year: -1 } }, { $limit: 1 }],
           as: "population",
         },
       },

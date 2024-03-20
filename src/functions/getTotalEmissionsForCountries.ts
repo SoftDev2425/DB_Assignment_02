@@ -5,6 +5,7 @@ async function getNewestReportingYear() {
     return newestYear?.reportingYear;
 }
 
+// 9
 export const getTotalEmissionsForCountries = async () => {
     try {
         const newestReportingYear = await getNewestReportingYear();

@@ -1,5 +1,6 @@
 import Cities from "../models/cities";
 
+// 6
 export const getCitiesEmissions = async () => {
   try {
     let result = await Cities.aggregate([

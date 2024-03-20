@@ -1,5 +1,6 @@
 import GHG_Emissions from "../models/GHG_Emissions";
 
+// 3
 export const getAvgEmissionForC40AndNonC40 = async () => {
   try {
     const pipeline = [

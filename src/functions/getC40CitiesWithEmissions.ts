@@ -2,12 +2,11 @@ import Cities from "../models/cities";
 import GHG_Emissions from "../models/GHG_Emissions";
 import Organisations from "../models/organisations";
 
+// 7
 export const getC40CitiesWithEmissions = async (C40Status: string) => {
   try {
-    // const cities = await Cities.find().where('C40Status').equals(C40Status == "C40" ? true : false);
-
     const c40Cities = await Cities.find({
-      C40Status: C40Status === "C40" ? true : false,
+      C40Status: C40Status == "C40" ? true : false,
     }).select("_id");
 
     const cityIds = c40Cities.map((city) => city._id);
@@ -47,29 +46,15 @@ export const getC40CitiesWithEmissions = async (C40Status: string) => {
         },
         emissions: {
           id: emission._id,
-          reportingYear: emission.reportingYear
-            ? emission.reportingYear
-            : "N/A",
-          mesurementYear: emission.mesurementYear
-            ? emission.mesurementYear
-            : "N/A",
-          totalCityWideEmissionsCO2: emission.totalCityWideEmissionsCO2
-            ? emission.totalCityWideEmissionsCO2
-            : "N/A",
-          totalScope1_CO2: emission.totalScope1_CO2
-            ? emission.totalScope1_CO2
-            : "N/A",
-          totalScope2_CO2: emission.totalScope2_CO2
-            ? emission.totalScope2_CO2
-            : "N/A",
-          gassesIncluded: emission.gassesIncluded
-            ? emission.gassesIncluded
-            : "N/A",
+          reportingYear: emission.reportingYear ? emission.reportingYear : "N/A",
+          mesurementYear: emission.mesurementYear ? emission.mesurementYear : "N/A",
+          totalCityWideEmissionsCO2: emission.totalCityWideEmissionsCO2 ? emission.totalCityWideEmissionsCO2 : "N/A",
+          totalScope1_CO2: emission.totalScope1_CO2 ? emission.totalScope1_CO2 : "N/A",
+          totalScope2_CO2: emission.totalScope2_CO2 ? emission.totalScope2_CO2 : "N/A",
+          gassesIncluded: emission.gassesIncluded ? emission.gassesIncluded : "N/A",
           boundary: emission.boundary ? emission.boundary : "N/A",
           methodology: emission.methodology ? emission.methodology : "N/A",
-          methodologyDetails: emission.methodologyDetails
-            ? emission.methodologyDetails
-            : "N/A",
+          methodologyDetails: emission.methodologyDetails ? emission.methodologyDetails : "N/A",
           description: emission.description ? emission.description : "N/A",
           comment: emission.comment ? emission.comment : "N/A",
           status: emission.emissionStatusType_id.type,
