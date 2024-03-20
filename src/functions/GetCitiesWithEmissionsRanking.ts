@@ -2,8 +2,8 @@ import Cities from "../models/cities";
 import Organisations from "../models/organisations";
 import GHG_Emissions from "../models/GHG_Emissions";
 
-export const getCitiesWithEmissionsRanking = async (Order: string) => {
-  const sortOrder: 1 | -1 = Order.toUpperCase() === "ASC" ? 1 : -1;
+export const getCitiesWithEmissionsRanking = async (order: string) => {
+  const sortOrder: 1 | -1 = order.toUpperCase() === "ASC" ? 1 : -1;
 
   try {
     let mostRecentYearResult = await GHG_Emissions.aggregate([
@@ -94,7 +94,10 @@ export const getCitiesWithEmissionsRanking = async (Order: string) => {
       { $sort: { "Emission.TotalEmissions": sortOrder } },
       { $limit: 10 },
     ]);
-    return result;
+    return {
+      ranked: order,
+      result,
+    };
   } catch (error) {
     console.error("Error:", error);
     throw error;
